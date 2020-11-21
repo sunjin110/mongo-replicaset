@@ -1,0 +1,61 @@
+version: "3"
+services: 
+  mongodb-primary:
+    image: mongo:4.2.0-bionic
+    container_name: mongodb-primary
+    hostname: mongodb-primary
+    command: >
+      mongod
+      -- port 27017
+      -- replSet replSet
+#      --auth --keyFile /etc/mongod-keyfile
+    # environment: 
+      # MONGO_INITDB_ROOT_USERNAME: root
+      # MONGO_INITDB_ROOT_PASSWORD: password
+    volumes: 
+      - ./volumes/mongodb/root:/root:ro # Initialize script
+    ports: 
+      - 27017:27017
+    networks: 
+      - replset
+    depends_on: 
+      - mongodb-secondary
+      - mongodb-arbiter
+    restart: on-failure
+  mongodb-secondary:
+    image: mongo:4.2.0-bionic
+    container_name: mongodb-secondary
+    hostname: mongodb-secondary
+    command: >
+      mongod
+      --port 27018
+      --replSet replset
+#      --auth --keyFile /etc/mongod-keyfile
+    # volumes: 
+    ports: 
+      - 27018:27018
+    networks: 
+      - replset
+    depends_on: 
+      - mongodb-arbiter
+    restart: on-failure
+  mongodb-arbiter:
+    image: mongo:4.2.0-bionic
+    container_name: mongodb-arbiter
+    hostname: mongodb-arbiter
+    command: >
+      mongod
+      --port 27019
+      --replSet replset
+#      --auth --keyFile /etc/mongod-keyfile
+    ports: 
+      - 27019:27019
+    networks: 
+      - replset
+    restart: on-failure
+
+networks: 
+  replset:
+    ipam: 
+      config: 
+        - subnet: 192.169.1.0/24
