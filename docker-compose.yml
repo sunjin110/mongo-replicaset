@@ -6,8 +6,8 @@ services:
     hostname: mongodb-primary
     command: >
       mongod
-      -- port 27017
-      -- replSet replSet
+      --port 27017
+      --replSet replSet
 #      --auth --keyFile /etc/mongod-keyfile
     # environment: 
       # MONGO_INITDB_ROOT_USERNAME: root
